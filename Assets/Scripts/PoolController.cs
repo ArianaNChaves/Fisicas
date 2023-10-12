@@ -16,16 +16,18 @@ public class PoolController : MonoBehaviour
     [SerializeField] private GameObject bulletPrefab; 
     [SerializeField] private GameObject targetPrefab;
     [SerializeField] private GameObject scorePrefab;
-    [SerializeField] private int initialCountOfPool;
+    [SerializeField] private int initialCountOfBullet;
+    [SerializeField] private int initialCountOfScore;
+    [SerializeField] private int initialCountOfTarget;
     [SerializeField] private Transform shootDirection;
     [SerializeField] private float bulletForce;
     
     private Dictionary<ObjectType, List<GameObject>> _pool;
-    
+    private GameObject _bulletToShoot;
 
     private bool _creatingObject = false;
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         _pool = new Dictionary<ObjectType, List<GameObject>>();
 
@@ -34,40 +36,42 @@ public class PoolController : MonoBehaviour
         _pool[ObjectType.Score] = new List<GameObject>();
         
         
-        for (int i = 0; i < initialCountOfPool; i++)
+        
+        for (int i = 0; i < initialCountOfBullet; i++)
         {
             var bullet = Instantiate(bulletPrefab);
-            var target = Instantiate(targetPrefab);
-            var score = Instantiate(scorePrefab);
-            
             bullet.SetActive(false);
-            target.SetActive(false);
-            score.SetActive(false);
-            
             _pool[ObjectType.Bullet].Add(bullet); 
-            _pool[ObjectType.Target].Add(target);
+        }
+        for (int i = 0; i < initialCountOfScore; i++)
+        {
+            var score = Instantiate(scorePrefab);
+            score.SetActive(false);
             _pool[ObjectType.Score].Add(score);
         }
+        for (int i = 0; i < initialCountOfTarget; i++)
+        {
+            var target = Instantiate(targetPrefab);
+            target.GetComponent<Target>().ID = i;
+            target.SetActive(false);
+            _pool[ObjectType.Target].Add(target);
+        }
+        
 
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
             if (!_creatingObject)
             {
                 _creatingObject = true;
-                GameObject bulletToShoot = GetObjectFromPool(ObjectType.Bullet);
-                Debug.Log("Update - bulletToShot: " + bulletToShoot);
-                bulletToShoot.SetActive(true);
-        
-                bulletToShoot.transform.position = shootDirection.position;
-                bulletToShoot.transform.rotation = shootDirection.rotation;
-                
-                bulletToShoot.GetComponent<Rigidbody>().AddForce(bulletToShoot.transform.forward * bulletForce, ForceMode.Impulse);
-                
+                _bulletToShoot = GetObjectFromPool(ObjectType.Bullet);
+                _bulletToShoot.SetActive(true);
+                _bulletToShoot.transform.position = shootDirection.position;
+                _bulletToShoot.transform.rotation = shootDirection.rotation;
                 _creatingObject = false;
             }
         }
@@ -76,7 +80,12 @@ public class PoolController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        
+        if (_bulletToShoot != null)
+        {
+            Rigidbody bulletRigidbody = _bulletToShoot.GetComponent<Rigidbody>();
+            bulletRigidbody.AddForce(_bulletToShoot.transform.forward * bulletForce, ForceMode.Impulse);
+            _bulletToShoot = null;
+        }
     }
 
     private GameObject GetObjectFromPool(ObjectType type)
@@ -113,10 +122,8 @@ public class PoolController : MonoBehaviour
         {
             case ObjectType.Bullet:
                 objectFromPool.transform.position = shootDirection.position;
-                objectFromPool.GetComponent<shootBullet>().notifyCollision = OnBulletllCollosion;
-                
+                objectFromPool.GetComponent<ShootBullet>().notifyCollision = OnBulletllCollosion;
                 return objectFromPool;
-                break;
             case ObjectType.Target:
                 Debug.Log("Type.Target");
                 break;
@@ -130,7 +137,6 @@ public class PoolController : MonoBehaviour
         
         Debug.LogError("GetObjectFromPool - Si llego aca seguramente explota");
         return objectFromPool;
-
     }
     
     public void OnBulletllCollosion(GameObject addBulletToPool)

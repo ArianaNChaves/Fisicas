@@ -367,7 +367,9 @@
 "Assets/Scripts/CameraMove.cs"
 "Assets/Scripts/GameController.cs"
 "Assets/Scripts/PoolController.cs"
-"Assets/Scripts/shootBullet.cs"
+"Assets/Scripts/ShootBullet.cs"
+"Assets/Scripts/Spawn.cs"
+"Assets/Scripts/Target.cs"
 "Assets/TutorialInfo/Scripts/Readme.cs"
 -langversion:9.0
 

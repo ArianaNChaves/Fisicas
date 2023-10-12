@@ -3,9 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class shootBullet : MonoBehaviour
+public class ShootBullet : MonoBehaviour
 {
     public Action<GameObject> notifyCollision;
+    [SerializeField] private float secondsToDesactivate;
+    private Coroutine _desactivateCoroutine;
 
 
 // Start is called before the first frame update
@@ -21,16 +23,17 @@ public class shootBullet : MonoBehaviour
     }
     private void OnCollisionEnter(Collision collision)
     {
+        Debug.Log("Colisión detectada con: " + collision.transform.name);
         if (collision.transform.name.Equals("Floor"))
         {
+            if (_desactivateCoroutine != null)
+            {
+                StopCoroutine(_desactivateCoroutine);
+            }
             
-            
-          Debug.Log("shootBullet - OnCollisionEnter - gameobject: " + gameObject);
-          notifyCollision.Invoke(gameObject); 
-           Debug.Log("shootBullet - OnCollisionEnter - gameobject: " + gameObject);
-
-           gameObject.SetActive(false);    
-
+            Debug.Log("Iniciando corrutina para desactivar la bala");
+            notifyCollision.Invoke(gameObject);
+            _desactivateCoroutine = StartCoroutine(DeactivateAfterSeconds(secondsToDesactivate));
         }
     }
 
@@ -44,6 +47,20 @@ public class shootBullet : MonoBehaviour
 
         }
     }
+    
+    private IEnumerator DeactivateAfterSeconds(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        
+        Debug.Log("Desactivando la bala");
+
+        if (gameObject.activeSelf)
+        {
+            gameObject.SetActive(false);    
+        }
+
 
     
+    }
 }
+
