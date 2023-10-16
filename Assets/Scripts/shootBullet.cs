@@ -2,12 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class ShootBullet : MonoBehaviour
 {
     public Action<GameObject> notifyCollision;
-    [SerializeField] private float secondsToDesactivate;
-    private Coroutine _desactivateCoroutine;
+    [SerializeField] private float secondsToDeactivate;
+    private Coroutine _deactivateCoroutine;
 
 
 // Start is called before the first frame update
@@ -23,44 +24,42 @@ public class ShootBullet : MonoBehaviour
     }
     private void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("Colisión detectada con: " + collision.transform.name);
-        if (collision.transform.name.Equals("Floor"))
+        if (collision.transform.CompareTag("Target"))
         {
-            if (_desactivateCoroutine != null)
+            gameObject.SetActive(false);
+        }
+        if (collision.transform.CompareTag("Floor"))
+        {
+            if (_deactivateCoroutine != null)
             {
-                StopCoroutine(_desactivateCoroutine);
+                StopCoroutine(_deactivateCoroutine);
             }
             
-            Debug.Log("Iniciando corrutina para desactivar la bala");
             notifyCollision.Invoke(gameObject);
-            _desactivateCoroutine = StartCoroutine(DeactivateAfterSeconds(secondsToDesactivate));
+            
+            if (gameObject.activeSelf)
+            {
+                _deactivateCoroutine = StartCoroutine(DeactivateAfterSeconds(secondsToDeactivate));
+            }
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.transform.name.Equals("Window") && gameObject.activeSelf)
+        if (other.transform.CompareTag("Window") && gameObject.activeSelf)
         {
-            
             notifyCollision.Invoke(gameObject);
             gameObject.SetActive(false);    
-
         }
     }
     
     private IEnumerator DeactivateAfterSeconds(float seconds)
     {
         yield return new WaitForSeconds(seconds);
-        
-        Debug.Log("Desactivando la bala");
-
         if (gameObject.activeSelf)
         {
             gameObject.SetActive(false);    
         }
-
-
-    
     }
 }
 

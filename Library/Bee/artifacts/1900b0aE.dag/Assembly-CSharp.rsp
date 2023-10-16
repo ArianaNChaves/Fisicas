@@ -367,6 +367,7 @@
 "Assets/Scripts/CameraMove.cs"
 "Assets/Scripts/GameController.cs"
 "Assets/Scripts/PoolController.cs"
+"Assets/Scripts/ScoreManager.cs"
 "Assets/Scripts/ShootBullet.cs"
 "Assets/Scripts/Spawn.cs"
 "Assets/Scripts/Target.cs"
