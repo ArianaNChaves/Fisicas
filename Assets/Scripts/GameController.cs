@@ -9,16 +9,17 @@ public class GameController : MonoBehaviour
     [SerializeField] private int timer;
     [SerializeField] private Transform shootDirection;
     [SerializeField] private float bulletForce;
-    [SerializeField]  private PoolController poolController;
+    [SerializeField] private PoolController poolController;
     
     private GameObject _bullet;
     private bool _startTimer = false;
     private bool _isShooting = false;
     private bool _isTimeOut = false;
+    private int _actualTime;
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-
+        _actualTime = timer;
     }
 
     // Update is called once per frame
@@ -28,7 +29,7 @@ public class GameController : MonoBehaviour
         {
             if (!_startTimer && !_isTimeOut)
             {
-                StartCoroutine(CountdownTimer(timer));
+                StartCoroutine(CountdownTimer());
                 _startTimer = true;
             }
             if (!_isShooting)
@@ -56,16 +57,18 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private IEnumerator CountdownTimer(int time)
+    private IEnumerator CountdownTimer()
     {
-        while (time > 0)
+        
+        while (_actualTime > 0)
         {
-            Debug.Log("Time remaining: " + time);
             yield return new WaitForSeconds(1);
-            time--;
+            _actualTime--;
         }
         
         Debug.Log("Time's up!");
         _isTimeOut = true;
     }
+
+    public int ActualTime => _actualTime;
 }

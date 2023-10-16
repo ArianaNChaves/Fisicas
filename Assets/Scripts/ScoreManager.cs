@@ -4,20 +4,22 @@ using UnityEngine;
 
 public class ScoreManager : MonoBehaviour
 {
-    public static ScoreManager instance;
-    private int _globalScore = 0;
+    private static ScoreManager _instance;
+    private int _globalScore;
     // Start is called before the first frame update
     
     private void Awake()
     {
-        if (instance == null)
+        if (_instance == null)
         {
-            instance = this;
+            _instance = this;
         }
         else
         {
             Destroy(gameObject);
         }
+
+        _globalScore = 0;
     }
 
     private void Start()
@@ -41,4 +43,6 @@ public class ScoreManager : MonoBehaviour
         _globalScore += 1;
         Debug.Log("Score: " + _globalScore);
     }
+
+    public int GlobalScore => _globalScore;
 }

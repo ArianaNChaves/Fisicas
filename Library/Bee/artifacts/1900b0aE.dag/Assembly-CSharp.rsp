@@ -371,6 +371,7 @@
 "Assets/Scripts/ShootBullet.cs"
 "Assets/Scripts/Spawn.cs"
 "Assets/Scripts/Target.cs"
+"Assets/Scripts/UIGameController.cs"
 "Assets/TutorialInfo/Scripts/Readme.cs"
 -langversion:9.0
 

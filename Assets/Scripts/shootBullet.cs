@@ -1,46 +1,28 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class ShootBullet : MonoBehaviour
 {
     public Action<GameObject> notifyCollision;
     [SerializeField] private float secondsToDeactivate;
+
     private Coroutine _deactivateCoroutine;
 
-
-// Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.transform.CompareTag("Target"))
         {
-            gameObject.SetActive(false);
+            NotifyAndDeactivate(0.2f);
         }
-        if (collision.transform.CompareTag("Floor"))
+        else if (collision.transform.CompareTag("Floor"))
         {
             if (_deactivateCoroutine != null)
             {
                 StopCoroutine(_deactivateCoroutine);
             }
             
-            notifyCollision.Invoke(gameObject);
-            
-            if (gameObject.activeSelf)
-            {
-                _deactivateCoroutine = StartCoroutine(DeactivateAfterSeconds(secondsToDeactivate));
-            }
+            NotifyAndDeactivate(secondsToDeactivate);
         }
     }
 
@@ -48,18 +30,22 @@ public class ShootBullet : MonoBehaviour
     {
         if (other.transform.CompareTag("Window") && gameObject.activeSelf)
         {
-            notifyCollision.Invoke(gameObject);
-            gameObject.SetActive(false);    
+            NotifyAndDeactivate(0);  
         }
     }
-    
+
+    private void NotifyAndDeactivate(float delay)
+    {
+        notifyCollision?.Invoke(gameObject); 
+        _deactivateCoroutine = StartCoroutine(DeactivateAfterSeconds(delay));
+    }
+
     private IEnumerator DeactivateAfterSeconds(float seconds)
     {
         yield return new WaitForSeconds(seconds);
         if (gameObject.activeSelf)
         {
-            gameObject.SetActive(false);    
+            gameObject.SetActive(false);
         }
     }
 }
-
